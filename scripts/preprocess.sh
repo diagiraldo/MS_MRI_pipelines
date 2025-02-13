@@ -5,12 +5,11 @@
 # Diana Giraldo, Nov 2022
 # It requires: ANTs, HD-BET
 
-############################################
-# Inputs: 
-# Raw Nifti image
+############################################ 
+# Input: Raw Nifti image
 RAW_IM=${1}
-# Folder for processed MRI
-PRO_DIR=${2}
+# Folder for pre-processed MRI
+OUT_DIR=${2}
 # ANTs directory (bin)
 ANTS_DIR=${3}
 ############################################
@@ -24,8 +23,6 @@ IM_BN=$(basename ${RAW_IM} | sed 's/.nii.gz//')
 JSFILE=$( echo ${RAW_IM} | sed 's/.nii.gz//').json
 
 # Output directory
-TMP_PTH=$(dirname ${RAW_IM} | rev | cut -d"/" --fields=1,2,3 | rev )
-OUT_DIR=${PRO_DIR}/${TMP_PTH}
 mkdir -p ${OUT_DIR}
 
 # Denoise
