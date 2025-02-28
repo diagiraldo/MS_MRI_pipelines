@@ -26,17 +26,19 @@ JSFILE=$( echo ${RAW_IM} | sed 's/.nii.gz//').json
 mkdir -p ${OUT_DIR}
 
 # Denoise
+echo "Denoising..."
 DenoiseImage -d 3 -n Rician -i ${RAW_IM} -o ${OUT_DIR}/${IM_BN}_dn.nii.gz
 # Calculate absolute value to remove negatives
 ImageMath 3 ${OUT_DIR}/${IM_BN}_dnabs.nii.gz abs ${OUT_DIR}/${IM_BN}_dn.nii.gz
 mv ${OUT_DIR}/${IM_BN}_dnabs.nii.gz ${OUT_DIR}/${IM_BN}_dn.nii.gz
 
 # Brain Extraction
-hd-bet -i ${OUT_DIR}/${IM_BN}_dn.nii.gz -o ${OUT_DIR}/${IM_BN}_bet.nii.gz -device cpu -mode fast -tta 0 > /dev/null
-rm ${OUT_DIR}/${IM_BN}_bet.nii.gz
-mv ${OUT_DIR}/${IM_BN}_bet_mask.nii.gz ${OUT_DIR}/${IM_BN}_brainmask.nii.gz
+echo "Getting brain mask..."
+hd-bet -i ${OUT_DIR}/${IM_BN}_dn.nii.gz -o ${OUT_DIR}/${IM_BN}_bet.nii.gz --save_bet_mask --no_bet_image -device cpu --disable_tta > /dev/null
+mv ${OUT_DIR}/${IM_BN}_bet_bet.nii.gz ${OUT_DIR}/${IM_BN}_brainmask.nii.gz
 
 # Biasfield correction N4
+echo "Bias-field correction..."
 N4BiasFieldCorrection -d 3 -i ${OUT_DIR}/${IM_BN}_dn.nii.gz -o ${OUT_DIR}/${IM_BN}_preproc.nii.gz -x ${OUT_DIR}/${IM_BN}_brainmask.nii.gz
 
 # Remove denoised image
@@ -48,5 +50,5 @@ cp ${JSFILE} ${OUT_DIR}/.
 ############################################
 # Output:
 # preprocessed image 
-echo ${OUT_DIR}/${IM_BN}_preproc.nii.gz
+echo "Prepocessed image: ${OUT_DIR}/${IM_BN}_preproc.nii.gz"
 ############################################

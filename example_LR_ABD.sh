@@ -21,6 +21,9 @@ SEGF_DIR=${SCR_DIR}/LSTfunctions/
 # PRETTIER directory for MRI super-resolution
 PRETTIER_DIR=/home/vlab/PRETTIER
 
+# MRtrix3 directory
+MRTRIX3_DIR=/home/vlab/mrtrix3
+
 ###################################################
 # Image directory containing raw T1 and FLAIR images
 CASE=0030403
@@ -80,7 +83,7 @@ HR_grid=${IM_DIR}/HRgrid_1mm.nii.gz
 zsh ${SCR_DIR}/get_HRgrid.sh ${BM_DIR} 1 ${HR_grid}
 
 # Align and combine PRETTIER outputs
-export PYTHONPATH=/home/vlab/mrtrix3/lib:$PYTHONPATH
+export PYTHONPATH=${MRTRIX3_DIR}/lib:$PYTHONPATH
 ${SCR_DIR}/align_combine.py $(ls ${SR_DIR}/*.nii.gz) ${HR_grid} ${IM_DIR}/HR_FLAIR_combined_prettierEDSR.nii.gz -masks $(ls ${SRM_DIR}/*.nii.gz) -iter 2 -force
 
 ###################################################################################
