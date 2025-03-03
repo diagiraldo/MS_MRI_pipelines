@@ -16,6 +16,9 @@ ANTS_DIR=${3}
 
 export ANTSPATH=${ANTS_DIR}
 
+echo "-------------------------------------------------------------"
+echo "Input image: ${RAW_IM}"
+
 # Image basename
 IM_BN=$(basename ${RAW_IM} | sed 's/.nii.gz//')
 
@@ -23,6 +26,7 @@ IM_BN=$(basename ${RAW_IM} | sed 's/.nii.gz//')
 JSFILE=$( echo ${RAW_IM} | sed 's/.nii.gz//').json
 
 # Output directory
+echo "Output directory: ${OUT_DIR}"
 mkdir -p ${OUT_DIR}
 
 # Denoise
@@ -51,4 +55,5 @@ cp ${JSFILE} ${OUT_DIR}/.
 # Output:
 # preprocessed image 
 echo "Prepocessed image: ${OUT_DIR}/${IM_BN}_preproc.nii.gz"
+echo "-------------------------------------------------------------"
 ############################################

@@ -2,7 +2,7 @@
 
 # Example Process session with fast HR FLAIR (C), and sT1 MRI
 # Diana Giraldo, Nov 2022
-# Last update: Feb 2025
+# Last update: March 2025
 
 ###################################################
 # Requirements:
@@ -22,13 +22,16 @@ SEGF_DIR=${SCR_DIR}/LSTfunctions/
 # Image directory containing raw T1 and FLAIR images
 CASE=0229128
 DATE=20160818
-IM_DIR=/home/vlab/MS_proj/MS_MRI/sub-${CASE}/ses-${DATE}/anat
+RAW_IM_DIR=/home/vlab/MS_proj/MS_MRI/sub-${CASE}/ses-${DATE}/anat
+
+# Directory for processed images
+IM_DIR=/home/vlab/testpipeline
 
 ###################################################################################
 # Pre-process T1 and FLAIR images in IM_DIR
 for SEQ in sT1 Flair_fast; 
 do
-    RAW_IM=$(ls ${IM_DIR}/*${SEQ}*.nii* | head -n 1 )
+    RAW_IM=$(ls ${RAW_IM_DIR}/*${SEQ}*.nii* | head -n 1 )
     zsh ${SCR_DIR}/preprocess.sh ${RAW_IM} ${IM_DIR} ${ANTS_DIR}
 done
 
@@ -101,3 +104,6 @@ matlab -nodisplay -r "addpath('$SPM_DIR'); addpath('$SEGF_DIR'); cd '$OUT_DIR'; 
 mrconvert ${PLES} ${OUT_DIR}/ples_lpa.nii.gz 
 mv ${OUT_DIR}/LST_tlv_${thLST}_*.csv ${OUT_DIR}/LST_lpa_${thLST}.csv
 rm ${OUT_DIR}/input.nii ${OUT_DIR}/minput.nii ${OUT_DIR}/LST_lpa_minput.mat ${PLES}
+
+# Remove adjusted images
+rm ${IM_DIR}/HR_FLAIR_seginput.nii.gz ${IM_DIR}/HR_T1_seginput.nii.gz

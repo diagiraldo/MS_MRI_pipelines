@@ -1,14 +1,10 @@
-#!/usr/bin/python3
-
-import os, sys
+import os
 
 def usage(cmdline): #pylint: disable=unused-variable
     
     cmdline.set_author('Diana L. Giraldo (diana.giraldofranco@uantwerpen.be)')
     cmdline.set_synopsis('Perform iterative alignment, upsampling and averaging of multiple images.')
-    #cmdline.add_description('This script is intended to be a baseline interpolation approach for multi-image super-resolution')
     cmdline.add_description('It uses mrtransform, mrregister, for_each and maskfilter from mrtrix3, and hd-bet.')
-    
     cmdline.add_argument('inputs', help='Input images', nargs='+')
     cmdline.add_argument('grid', help='Image with template grid')
     cmdline.add_argument('output', help='output image')
@@ -59,7 +55,7 @@ def execute(): #pylint: disable=unused-variable
 
         else:
             ref_img = 'output.nii.gz' 
-            ref_mask = 'bet_mask.nii.gz'
+            ref_mask = 'bet_bet.nii.gz'
             grid_temp = ref_img
         
         path.make_dir('transforms' + str(it))
@@ -84,7 +80,8 @@ def execute(): #pylint: disable=unused-variable
         
         # Mask output
         if it < (app.ARGS.iter-1) and use_masks:
-            os.system('hd-bet -i output.nii.gz -o bet.nii.gz -device cpu -mode fast -tta 0 > /dev/null')
+            #os.system('hd-bet -i output.nii.gz -o bet.nii.gz -device cpu -mode fast -tta 0 > /dev/null')
+            os.system('hd-bet -i output.nii.gz -o bet.nii.gz --save_bet_mask --no_bet_image --disable_tta -device cpu > /dev/null')
             
     # Create output
     run.command('mrconvert output.nii.gz ' + path.from_user(app.ARGS.output),
