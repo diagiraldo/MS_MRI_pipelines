@@ -51,8 +51,8 @@ mkdir -p ${FL_DIR} ${BM_DIR}
 for IM in $(ls ${IM_DIR}/*[Ff][Ll][Aa][Ii][Rr]*preproc.nii.gz); 
 do
     SLC=$( mrinfo ${IM} -spacing -config RealignTransform 0 | cut -d" " -f3 )
-    if [[ ${SLC} > ${SLICE_THRESHOLD} ]]; then
-        echo "Low resolution image ${IM}"
+    if [[ ${SLC} -gt ${SLICE_THRESHOLD} ]]; then
+        echo "Low resolution image: ${IM}"
         cp ${IM} ${FL_DIR}/.
         cp ${IM%_preproc.nii.gz}_brainmask.nii.gz ${BM_DIR}/.
     fi
@@ -62,6 +62,11 @@ done
 HM_DIR=${IM_DIR}/LR_FLAIR_hmatch
 zsh ${SCR_DIR}/histmatch_folder.sh ${FL_DIR} ${BM_DIR} ${HM_DIR}
 rm -r ${FL_DIR}
+
+# Create a 1mm grid with FOV containing brain
+HR_grid=${IM_DIR}/HRgrid_1mm.nii.gz
+zsh ${SCR_DIR}/get_HRgrid.sh ${BM_DIR} 1 ${HR_grid}
+rm -r ${BM_DIR}
 
 # Apply PRETTIER to each LR and obtain a brain mask for each one
 SR_DIR=${IM_DIR}/LR_FLAIR_prettier
@@ -83,13 +88,13 @@ do
     fi
 done
 
-# Create a 1mm grid 
-HR_grid=${IM_DIR}/HRgrid_1mm.nii.gz
-zsh ${SCR_DIR}/get_HRgrid.sh ${BM_DIR} 1 ${HR_grid}
 
 # Align and combine PRETTIER outputs
 export PYTHONPATH=${MRTRIX3_DIR}/lib:$PYTHONPATH
 python ${SCR_DIR}/align_combine.py $(ls ${SR_DIR}/*.nii.gz) ${HR_grid} ${IM_DIR}/HR_FLAIR_combined_prettierEDSR.nii.gz -masks $(ls ${SRM_DIR}/*.nii.gz) -iter 2 -force
+
+#
+rm -r ${HM_DIR} ${SRM_DIR}
 
 ###################################################################################
 # Segmentation
@@ -100,9 +105,8 @@ HRFLAIR=${IM_DIR}/HR_FLAIR_combined_prettierEDSR.nii.gz
 # Create a brain mask for the HR image
 HRFLMASK=${IM_DIR}/HR_FLAIR_prettierEDSR_brainmask.nii.gz 
 if [[ ! -f ${HRFLMASK} ]]; then
-    hd-bet -i ${HRFLAIR} -o ${IM_DIR}/HR_FLAIR_bet.nii.gz -device cpu -mode fast -tta 0 > /dev/null
-    rm ${IM_DIR}/HR_FLAIR_bet.nii.gz
-    mv ${IM_DIR}/HR_FLAIR_bet_mask.nii.gz ${HRFLMASK}
+    hd-bet -i ${HRFLAIR} -o ${IM_DIR}/HR_FLAIR_bet.nii.gz --save_bet_mask --no_bet_image -device cpu --disable_tta > /dev/null
+    mv ${IM_DIR}/HR_FLAIR_bet_bet.nii.gz ${HRFLMASK}
 fi
 
 # Remove small values so segmentation doesn't fail

@@ -1,4 +1,8 @@
+#!/usr/bin/env python3
+
 import os
+import mrtrix3 
+from mrtrix3 import app, path, run #pylint: disable=no-name-in-module, import-outside-toplevel
 
 def usage(cmdline): #pylint: disable=unused-variable
     
@@ -13,8 +17,7 @@ def usage(cmdline): #pylint: disable=unused-variable
     cmdline.add_argument('-iter', type=int, help='Number of iterations. Default: 3.', default=3)
     
 def execute(): #pylint: disable=unused-variable
-    from mrtrix3 import app, image, path, run #pylint: disable=no-name-in-module, import-outside-toplevel
-    
+
     app.check_output_path(app.ARGS.output)
     
     nLR = len(app.ARGS.inputs)
@@ -89,7 +92,6 @@ def execute(): #pylint: disable=unused-variable
             
 
 # Execute the script
-import mrtrix3  #pylint: disable=wrong-import-position
 mrtrix3.execute() #pylint: disable=no-member
             
 
